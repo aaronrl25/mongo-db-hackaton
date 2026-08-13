@@ -41,6 +41,7 @@ import {
   X,
 } from "lucide-react";
 import { api, type Memory, type Message, type Preference } from "./api";
+import { Mascot } from "./Mascot";
 import {
   useConversationControls,
   useConversationStatus,
@@ -110,7 +111,7 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
         <Topbar page={page} status={status} />
         {loading ? (
           <div className="loader">
-            <BrainCircuit size={34} />
+            <Mascot size={64} />
             <span>Loading your coding personality…</span>
           </div>
         ) : page === "Overview" ? (
@@ -190,7 +191,7 @@ function Sidebar({
     <aside>
       <div className="brand">
         <div className="mark">
-          <Code2 size={19} />
+          <Mascot size={30} />
         </div>
         <div>
           <b>DevPersona</b>
@@ -393,7 +394,7 @@ function Workspace({
             <div className={"message " + m.role} key={m.id}>
               {m.role === "assistant" && (
                 <div className="ai-avatar">
-                  <Code2 size={16} />
+                  <Mascot pose="front" size={22} />
                 </div>
               )}
               <div>
@@ -411,7 +412,7 @@ function Workspace({
           {busy && (
             <div className="message assistant">
               <div className="ai-avatar">
-                <Code2 size={16} />
+                <Mascot pose="front" size={22} />
               </div>
               <div className="typing">
                 <i />
@@ -479,7 +480,7 @@ function RightPanel({
     <section className="right-panel">
       <div className={"voice-orb " + (listening ? "listening" : "")}>
         <div className="orb-core">
-          <AudioLines size={30} />
+          <Mascot pose={listening ? "talking" : "idle"} size={48} />
         </div>
         <span />
         <span />
