@@ -1,0 +1,118 @@
+/* Responsive overrides for the authenticated application and public surfaces. */
+@media (max-width: 1100px) {
+  .shell { min-width: 0; grid-template-columns: 210px minmax(0,1fr); }
+  aside { width: 210px; }
+  .page,.agent-dashboard,.creator-page { padding: 22px; }
+  .workspace { grid-template-columns: minmax(0,1fr); }
+  .right-panel { display: none; }
+  .messages { padding-inline: 5vw; }
+  .composer,.suggested-questions { margin-left: 5vw; margin-right: 5vw; padding-left: 0; padding-right: 0; }
+  .creator-layout { grid-template-columns: 1fr; }
+  .markdown-panel { position: static; }
+  .markdown-panel pre { height: 460px; }
+  .memory-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .pref-card { grid-template-columns: 38px minmax(0,1fr) 90px 25px; }
+}
+
+@media (max-width: 800px) {
+  .shell { display: block; min-height: 100vh; }
+  aside { position: sticky; top: 0; z-index: 20; width: 100%; height: auto; padding: 10px 12px; border-right: 0; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: 12px; background: #0b0e13ed; backdrop-filter: blur(16px); }
+  aside .brand { padding: 0; }
+  aside .brand small { display: none; }
+  aside .mark { width: 31px; height: 31px; }
+  aside nav { min-width: 0; flex-direction: row; overflow-x: auto; scrollbar-width: none; gap: 3px; }
+  aside nav::-webkit-scrollbar { display:none; }
+  aside nav button { flex: 0 0 auto; padding: 9px 10px; font-size: 0; }
+  aside nav button svg { width: 18px; }
+  aside nav button.active:before { left: 8px; right: 8px; bottom: -10px; top: auto; width: auto; height: 2px; }
+  aside nav .dot { position: absolute; right: 5px; top: 5px; }
+  aside .project,.learning { display: none; }
+  .aside-bottom { margin: 0; }
+  .profile { border: 0; padding: 0; }
+  .profile>div:not(.avatar),.profile .logout-icon { display: none; }
+  .avatar { width: 30px; height: 30px; }
+  main { grid-column: auto; }
+  header { position: relative; top: auto; height: 72px; padding: 14px 18px; }
+  header h1 { font-size: 16px; }
+  header p { max-width: 420px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .top-actions .icon-btn { display: none; }
+  .workspace { height: calc(100dvh - 133px); }
+  .context-strip { padding-inline: 16px; }
+  .messages { padding: 22px 18px; }
+  .composer { margin: 0 14px 14px; }
+  .suggested-questions { margin: 0; padding: 0 14px 8px; }
+  .page,.agent-dashboard,.creator-page { padding: 16px; }
+  .agent-hero { min-height: 180px; padding: 22px; }
+  .agent-hero h2 { font-size: 23px; }
+  .hero-agent-icon { width: 75px; height: 75px; margin-right: 0; }
+  .hero-agent-icon svg { width: 32px; }
+  .agent-dashboard-grid { grid-template-columns: 1fr; }
+  .agent-tool-row { grid-template-columns: 1fr; }
+  .stat-grid,.agent-metrics { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .memory-hero { padding: 22px; }
+  .memory-grid { grid-template-columns: 1fr; }
+  .pref-card { grid-template-columns: 38px minmax(0,1fr) 25px; }
+  .pref-card .confidence { grid-column: 2; text-align: left; }
+  .pref-card .confidence div { margin-left: 0; }
+  .pref-card .delete { grid-column: 3; grid-row: 1; }
+  .template-scroll { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .landing .product-stage { overflow: hidden; }
+  .login-card { max-width: 430px; }
+}
+
+@media (max-width: 560px) {
+  aside { grid-template-columns: auto minmax(0,1fr); }
+  aside .brand b { display: none; }
+  aside .profile { display: none; }
+  header { height: 66px; }
+  header p,.status { display: none; }
+  .workspace { height: calc(100dvh - 119px); }
+  .context-strip { height: 48px; gap: 6px; }
+  .context-strip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .context-strip button { flex: 0 0 auto; }
+  .message { max-width: 92%; }
+  .bubble { font-size: 12px; }
+  .instruction { height: 36px; }
+  .composer textarea { height: 66px; }
+  .compose-row>div>span { display: none; }
+  .voice { max-width: 70%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .agent-select { padding-inline: 14px; }
+  .agent-select-top { height: 64px; }
+  .agent-select-copy { padding: 48px 6px 30px; }
+  .agent-select-copy h1 { font-size: 31px; }
+  .agent-cards { grid-template-columns: 1fr; }
+  .agent-card { min-height: 315px; }
+  .agent-hero { display: block; }
+  .hero-agent-icon { display: none; }
+  .agent-metrics,.stat-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .agent-metrics article { padding: 12px; }
+  .agent-metrics b { font-size: 18px; }
+  .section-head { align-items: flex-start; gap: 12px; }
+  .section-head .primary { flex: 0 0 auto; }
+  .memory-hero { display: block; }
+  .memory-count { width: auto; border-left: 0; border-top: 1px solid #293322; margin-top: 20px; padding: 17px 0 0; }
+  .add-memory { flex-direction: column; }
+  .pref-card { padding: 11px; gap: 9px; }
+  .pref-main>div { display: block; }
+  .scope { margin-top: 7px; }
+  .scope span { margin-left: 0; margin-right: 4px; }
+  .modal { width: calc(100vw - 28px); padding: 22px; }
+  .privacy-banner { align-items: flex-start; }
+  .setting { gap: 14px; }
+  .template-gallery { padding: 14px; }
+  .template-scroll { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; }
+  .template-scroll>button { min-width: 230px; scroll-snap-align: start; }
+  .creator-page { padding: 12px; }
+  .creator-intro { padding: 17px; }
+  .creator-fields { padding: 15px; }
+  .choice-grid,.voice-creator .choice-grid { grid-template-columns: 1fr; }
+  .markdown-head { height: auto; min-height: 58px; gap: 8px; padding-block: 9px; }
+  .markdown-head button { font-size: 0; padding: 8px; }
+  .markdown-head button svg { width: 15px; height: 15px; }
+  .markdown-panel pre,.voice-creator .markdown-panel pre { height: 420px; padding: 15px; font-size: 8px; }
+  .feature-grid { grid-template-columns: 1fr; }
+  .hero { padding-inline: 18px; }
+  .hero h1 { font-size: clamp(42px,14vw,58px); }
+  .landing-final h2 { font-size: 29px; }
+  .landing footer>div { display:none; }
+}
