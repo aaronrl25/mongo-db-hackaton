@@ -42,6 +42,7 @@ import {
 } from "lucide-react";
 import { api, type Memory, type Message, type Preference } from "./api";
 import { Mascot } from "./Mascot";
+import Landing from "./Landing";
 import {
   useConversationControls,
   useConversationStatus,
@@ -155,18 +156,6 @@ function Tool({icon:Icon,title,text}:{icon:any;title:string;text:string}){return
 
 function PublicBrand() {
   return <div className="public-brand"><div className="mark"><Mascot size={30}/></div><b>DevPersona</b></div>;
-}
-
-function Landing({ onLogin, onStart }: { onLogin: () => void; onStart: () => void }) {
-  return <div className="landing">
-    <div className="landing-glow" />
-    <nav className="public-nav"><PublicBrand/><div className="public-links"><a href="#how">How it works</a><a href="#personality">Personality</a><a href="#privacy">Privacy</a></div><div className="public-actions"><button onClick={onLogin}>Sign in</button><button className="landing-cta" onClick={onStart}>Start building <ArrowRight size={15}/></button></div></nav>
-    <section className="hero"><div className="hero-pill"><Sparkles size={13}/> THE CODING AGENT THAT LEARNS YOU</div><h1>Your code.<br/><em>In your voice.</em></h1><p>DevPersona learns how you build—the stack you reach for, the patterns you trust, and how you like answers delivered. Then it codes with you, not at you.</p><div className="hero-actions"><button className="landing-cta big" onClick={onStart}>Meet your coding agent <ArrowRight size={17}/></button><button className="watch" onClick={onLogin}><span><Mic size={15}/></span> Try the voice workspace</button></div><div className="hero-proof"><span><Check/> No credit card</span><span><Check/> Works in demo mode</span><span><ShieldCheck/> Private by design</span></div></section>
-    <section className="product-stage" id="how"><div className="stage-window"><div className="stage-top"><div><i/><i/><i/></div><span>devpersona / orbit-mobile</span><span className="stage-live"><i/> PERSONALITY ACTIVE</span></div><div className="stage-body"><div className="stage-sidebar"><PublicBrand/><span className="selected"><AudioLines/> Voice workspace</span><span><BrainCircuit/> Personality</span><span><FolderGit2/> Project memory</span><span><History/> History</span></div><div className="stage-chat"><small>YOU</small><p>Build the profile settings flow. Keep it in my usual style.</p><div className="stage-answer"><div className="mini-mark"><Code2/></div><div><small>DEVPERSONA</small><p>Based on your coding personality, I’ll use <b>Expo, TypeScript, Expo Router, Zustand, Firebase</b>, feature-based architecture, and include tests.</p><div className="code-preview"><span>features/profile/</span><code>├── screens/ProfileSettings.tsx<br/>├── store/profile.store.ts<br/>└── __tests__/profile.test.ts</code></div></div></div><div className="stage-composer"><span>Ask DevPersona to build, debug, or explain…</span><Mic/><ArrowUp/></div></div><div className="stage-persona"><div className="mini-orb"><AudioLines/></div><b>Voice ready</b><small>Personality signals</small>{['TypeScript 98%','Expo + RN 94%','Zustand 89%','Code first 96%'].map(x=><span>{x}</span>)}</div></div></div></section>
-    <section className="landing-features" id="personality"><div className="feature-intro"><span className="eyebrow">A MEMORY THAT EARNS YOUR TRUST</span><h2>It gets more <em>you</em> every time.</h2><p>Every preference stays inspectable. See what was learned, why it was learned, and change it whenever you want.</p></div><div className="feature-grid"><article><BrainCircuit/><span>01</span><h3>Learns your coding DNA</h3><p>Languages, frameworks, architecture, testing style, response length, and refactoring boundaries.</p></article><article><Database/><span>02</span><h3>Remembers each project</h3><p>Atlas Vector Search retrieves the right decisions and conventions before every response.</p></article><article id="privacy"><ShieldCheck/><span>03</span><h3>You stay in control</h3><p>Confidence, sources, evidence, scope, retention, and deletion are always visible to you.</p></article></div></section>
-    <section className="landing-final"><div className="final-orb"><AudioLines/></div><h2>Ready to meet the agent<br/>that codes like you?</h2><button className="landing-cta big" onClick={onStart}>Start building for free <ArrowRight/></button></section>
-    <footer><PublicBrand/><span>© 2026 DevPersona</span><div><a>Privacy</a><a>Terms</a><a>GitHub</a></div></footer>
-  </div>;
 }
 
 function Login({ onBack, onLogin }: { onBack: () => void; onLogin: () => void }) {
