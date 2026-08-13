@@ -66,7 +66,7 @@ const nav = [
   ["History", History],
   ["Privacy", ShieldCheck],
 ] as const;
-const demoStatus = { mongo: false, openai: false, claude: false, elevenlabs: false };
+const demoStatus = { mongo: false, claude: false, elevenlabs: false };
 
 type Screen = "boot" | "landing" | "login" | "app";
 

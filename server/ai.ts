@@ -1,22 +1,7 @@
-import OpenAI from 'openai';
+import Anthropic from '@anthropic-ai/sdk';
 import type { Memory, Preference } from './types.ts';
-
-const client = process.env.OPENAI_API_KEY ? new OpenAI({apiKey:process.env.OPENAI_API_KEY}) : null;
-export async function embed(text:string) { if(!client) return []; const r=await client.embeddings.create({model:'text-embedding-3-small',input:text}); return r.data[0].embedding; }
-export function resolvePreferences(all:Preference[], projectId:string, instructions:string) {
-  const global=all.filter(p=>p.scope==='global'); const project=all.filter(p=>p.scope==='project'&&p.projectId===projectId);
-  const map=new Map(global.map(p=>[p.label,p])); project.forEach(p=>map.set(p.label,p));
-  return {resolved:[...map.values()].sort((a,b)=>b.confidence-a.confidence),instructions};
-}
-export async function respond(prompt:string, prefs:Preference[], memories:Memory[], instructions:string) {
-  if(!client) return `Based on your coding personality, I’ll use ${prefs.slice(0,6).map(p=>p.value).join(', ')}, and include tests.\n\nI’ve scoped the work to “${prompt}” and will follow your current instruction first, then project preferences, then global defaults.`;
-  const context=prefs.map(p=>`- ${p.label}: ${p.value} (${p.scope}, confidence ${p.confidence})`).join('\n');
-  const memory=memories.map(m=>`- ${m.text}`).join('\n');
-  const r=await client.responses.create({model:process.env.OPENAI_MODEL||'gpt-4.1-mini',instructions:`You are DevPersona, a coding agent. Precedence: CURRENT INSTRUCTIONS > PROJECT PREFERENCES > GLOBAL PREFERENCES. Be transparent about applied preferences.\nCurrent instructions: ${instructions||'none'}\nResolved preferences:\n${context}\nRelevant memory:\n${memory}`,input:prompt});
-  return r.output_text;
-}
-export async function extractPreferences(text:string) {
-  if(!client) return [];
-  const r=await client.responses.create({model:process.env.OPENAI_MODEL||'gpt-4.1-mini',input:`Extract durable developer preferences from this message. Return JSON array with category,label,value,confidence (0..1), scope (global|project), source (explicit|inferred), evidence. Only include genuinely supported preferences. Message: ${text}`,text:{format:{type:'json_schema',name:'preferences',strict:true,schema:{type:'object',properties:{preferences:{type:'array',items:{type:'object',properties:{category:{type:'string'},label:{type:'string'},value:{type:'string'},confidence:{type:'number'},scope:{type:'string',enum:['global','project']},source:{type:'string',enum:['explicit','inferred']},evidence:{type:'string'}},required:['category','label','value','confidence','scope','source','evidence'],additionalProperties:false}}},required:['preferences'],additionalProperties:false}}}});
-  try{return JSON.parse(r.output_text).preferences||[];}catch{return [];}
-}
+const anthropic=process.env.ANTHROPIC_API_KEY?new Anthropic({apiKey:process.env.ANTHROPIC_API_KEY}):null;
+export async function embed(text:string){const vector=new Array<number>(1536).fill(0);const terms=text.toLowerCase().match(/[a-z0-9_+#.-]+/g)||[];for(const term of terms){let hash=2166136261;for(let i=0;i<term.length;i++){hash^=term.charCodeAt(i);hash=Math.imul(hash,16777619)}vector[(hash>>>0)%vector.length]+=1}const norm=Math.sqrt(vector.reduce((sum,value)=>sum+value*value,0))||1;return vector.map(value=>value/norm)}
+export function resolvePreferences(all:Preference[],projectId:string,instructions:string){const global=all.filter(p=>p.scope==='global');const project=all.filter(p=>p.scope==='project'&&p.projectId===projectId);const map=new Map(global.map(p=>[p.label,p]));project.forEach(p=>map.set(p.label,p));return{resolved:[...map.values()].sort((a,b)=>b.confidence-a.confidence),instructions}}
+export async function respond(prompt:string,prefs:Preference[],memories:Memory[],instructions:string){if(!anthropic)throw new Error('Claude is not configured. Add ANTHROPIC_API_KEY and restart the API.');const context=prefs.map(p=>`- ${p.label}: ${p.value} (${p.scope}, confidence ${p.confidence})`).join('\n');const memory=memories.map(m=>`- ${m.text}`).join('\n');const system=`You are DevPersona, a practical coding agent. Answer the actual request directly; never repeat a generic personality summary. Silently apply relevant preferences and ignore irrelevant ones. Precedence: CURRENT INSTRUCTIONS > PROJECT PREFERENCES > GLOBAL PREFERENCES.\nCurrent instructions: ${instructions||'none'}\nResolved preferences:\n${context||'none'}\nRelevant project memory:\n${memory||'none'}`;const response=await anthropic.messages.create({model:process.env.CLAUDE_MODEL||'claude-sonnet-4-6',max_tokens:3000,system,messages:[{role:'user',content:prompt}]});return response.content.filter(x=>x.type==='text').map(x=>x.text).join('')}
+export async function extractPreferences(text:string){if(!anthropic)return[];const response=await anthropic.messages.create({model:process.env.CLAUDE_MODEL||'claude-sonnet-4-6',max_tokens:900,system:'Extract only durable developer preferences clearly supported by the message. Return strict JSON: {"preferences":[{"category":string,"label":string,"value":string,"confidence":number,"scope":"global"|"project","source":"explicit"|"inferred","evidence":string}]}. Otherwise return an empty array.',messages:[{role:'user',content:text}]});const raw=response.content.filter(x=>x.type==='text').map(x=>x.text).join('').replace(/^```json\s*|\s*```$/g,'');try{return JSON.parse(raw).preferences||[]}catch{return[]}}
