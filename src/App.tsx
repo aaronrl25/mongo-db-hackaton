@@ -154,7 +154,7 @@ function AgentDashboard({agent}:{agent:typeof agents[number]}){const data=dashbo
 function Tool({icon:Icon,title,text}:{icon:any;title:string;text:string}){return <button className="agent-tool"><Icon/><div><b>{title}</b><span>{text}</span></div><ArrowRight/></button>}
 
 function PublicBrand() {
-  return <div className="public-brand"><div className="mark"><Code2 size={19}/></div><b>DevPersona</b></div>;
+  return <div className="public-brand"><div className="mark"><Mascot size={30}/></div><b>DevPersona</b></div>;
 }
 
 function Landing({ onLogin, onStart }: { onLogin: () => void; onStart: () => void }) {
