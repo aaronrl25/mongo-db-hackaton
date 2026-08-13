@@ -155,7 +155,7 @@ function AgentDashboard({agent}:{agent:typeof agents[number]}){const data=dashbo
 function Tool({icon:Icon,title,text}:{icon:any;title:string;text:string}){return <button className="agent-tool"><Icon/><div><b>{title}</b><span>{text}</span></div><ArrowRight/></button>}
 
 function PublicBrand() {
-  return <div className="public-brand"><div className="mark"><Mascot size={30}/></div><b>DevPersona</b></div>;
+  return <div className="public-brand"><div className="mark"><Mascot pose="front" size={24}/></div><b>DevPersona</b></div>;
 }
 
 function Login({ onBack, onLogin }: { onBack: () => void; onLogin: () => void }) {
@@ -180,7 +180,7 @@ function Sidebar({
     <aside>
       <div className="brand">
         <div className="mark">
-          <Mascot size={30} />
+          <Mascot pose="front" size={24} />
         </div>
         <div>
           <b>DevPersona</b>
@@ -383,7 +383,7 @@ function Workspace({
             <div className={"message " + m.role} key={m.id}>
               {m.role === "assistant" && (
                 <div className="ai-avatar">
-                  <Mascot pose="front" size={22} />
+                  <Mascot pose="front" size={20} />
                 </div>
               )}
               <div>
@@ -401,7 +401,7 @@ function Workspace({
           {busy && (
             <div className="message assistant">
               <div className="ai-avatar">
-                <Mascot pose="front" size={22} />
+                <Mascot pose="front" size={20} />
               </div>
               <div className="typing">
                 <i />
