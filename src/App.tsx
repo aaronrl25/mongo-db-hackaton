@@ -43,19 +43,15 @@ const nav = [
 ] as const;
 const demoStatus = { mongo: false, openai: false, elevenlabs: false };
 
-type Screen = "landing" | "login" | "app";
+type Screen = "boot" | "landing" | "login" | "app";
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>(() =>
-    sessionStorage.getItem("devpersona-session") ? "app" : "landing",
-  );
-  const openApp = () => {
-    sessionStorage.setItem("devpersona-session", "demo");
-    setScreen("app");
-  };
-  if (screen === "landing") return <Landing onLogin={() => setScreen("login")} onStart={openApp} />;
-  if (screen === "login") return <Login onBack={() => setScreen("landing")} onLogin={openApp} />;
-  return <Dashboard onLogout={() => { sessionStorage.removeItem("devpersona-session"); setScreen("landing") }} />;
+  const [screen, setScreen] = useState<Screen>("boot");
+  useEffect(() => { api.auth.me().then(() => setScreen("app")).catch(() => setScreen("landing")) }, []);
+  if (screen === "boot") return <div className="auth-boot"><BrainCircuit/><span>Restoring your workspace…</span></div>;
+  if (screen === "landing") return <Landing onLogin={() => setScreen("login")} onStart={() => setScreen("login")} />;
+  if (screen === "login") return <Login onBack={() => setScreen("landing")} onLogin={() => setScreen("app")} />;
+  return <Dashboard onLogout={async () => { await api.auth.logout(); setScreen("landing") }} />;
 }
 
 function Dashboard({ onLogout }: { onLogout: () => void }) {
@@ -128,8 +124,9 @@ function Landing({ onLogin, onStart }: { onLogin: () => void; onStart: () => voi
 }
 
 function Login({ onBack, onLogin }: { onBack: () => void; onLogin: () => void }) {
-  const [email,setEmail]=useState(''),[password,setPassword]=useState(''),[show,setShow]=useState(false);
-  return <div className="login-page"><div className="login-art"><button className="back-brand" onClick={onBack}><PublicBrand/></button><div className="login-quote"><div className="quote-orb"><AudioLines/></div><blockquote>“It remembers that I hate default exports, prefer Zustand, and want the code before the explanation.”</blockquote><p><b>Marcus Chen</b><span>Staff Engineer at Vercel</span></p></div><div className="login-grid"/></div><div className="login-panel"><div className="login-card"><div className="mobile-brand"><PublicBrand/></div><span className="eyebrow">WELCOME BACK</span><h1>Continue building.</h1><p>Sign in to your developer personality.</p><button className="oauth" onClick={onLogin}><span>G</span> Continue with Google</button><button className="oauth" onClick={onLogin}><span className="github-mark">◈</span> Continue with GitHub</button><div className="divider"><span>or continue with email</span></div><form onSubmit={e=>{e.preventDefault();onLogin()}}><label>Email address<input required type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@company.com"/></label><label>Password<div className="password"><input required type={show?'text':'password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••"/><button type="button" onClick={()=>setShow(!show)}>{show?'Hide':'Show'}</button></div></label><div className="form-meta"><label><input type="checkbox"/> Remember me</label><button type="button">Forgot password?</button></div><button className="login-submit">Sign in <ArrowRight/></button></form><p className="signup">New to DevPersona? <button onClick={onLogin}>Create an account</button></p><small className="auth-note"><ShieldCheck/> Your preferences are encrypted and never used to train shared models.</small></div></div></div>;
+  const [email,setEmail]=useState(''),[password,setPassword]=useState(''),[name,setName]=useState(''),[show,setShow]=useState(false),[registering,setRegistering]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState('');
+  const submit=async(e:React.FormEvent)=>{e.preventDefault();setBusy(true);setError('');try{registering?await api.auth.register(name,email,password):await api.auth.login(email,password);onLogin()}catch(e){setError(e instanceof Error?e.message:'Authentication failed')}finally{setBusy(false)}};
+  return <div className="login-page"><div className="login-art"><button className="back-brand" onClick={onBack}><PublicBrand/></button><div className="login-quote"><div className="quote-orb"><AudioLines/></div><blockquote>“It remembers that I hate default exports, prefer Zustand, and want the code before the explanation.”</blockquote><p><b>Marcus Chen</b><span>Staff Engineer at Vercel</span></p></div><div className="login-grid"/></div><div className="login-panel"><div className="login-card"><div className="mobile-brand"><PublicBrand/></div><span className="eyebrow">{registering?'CREATE YOUR PERSONA':'WELCOME BACK'}</span><h1>{registering?'Start building.':'Continue building.'}</h1><p>{registering?'Create an account stored securely in MongoDB.':'Sign in to your developer personality.'}</p><button className="oauth" disabled title="Configure Google OAuth to enable"><span>G</span> Continue with Google</button><button className="oauth" disabled title="Configure GitHub OAuth to enable"><span className="github-mark">◈</span> Continue with GitHub</button><div className="divider"><span>or continue with email</span></div><form onSubmit={submit}>{registering&&<label>Your name<input required value={name} onChange={e=>setName(e.target.value)} placeholder="Ada Lovelace"/></label>}<label>Email address<input required type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@company.com"/></label><label>Password<div className="password"><input required minLength={8} type={show?'text':'password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder="At least 8 characters"/><button type="button" onClick={()=>setShow(!show)}>{show?'Hide':'Show'}</button></div></label>{error&&<div className="auth-error">{error}</div>}<div className="form-meta"><label><input type="checkbox" defaultChecked/> Keep me signed in</label>{!registering&&<button type="button">Forgot password?</button>}</div><button className="login-submit" disabled={busy}>{busy?'Please wait…':registering?'Create account':'Sign in'} <ArrowRight/></button></form><p className="signup">{registering?'Already have an account?':'New to DevPersona?'} <button onClick={()=>{setRegistering(!registering);setError('')}}>{registering?'Sign in':'Create an account'}</button></p><small className="auth-note"><ShieldCheck/> Passwords are hashed before they are stored in MongoDB.</small></div></div></div>;
 }
 function Sidebar({
   page,

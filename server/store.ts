@@ -24,7 +24,7 @@ let messages: Message[] = [
 class Store {
   client?: MongoClient;
   dbName = process.env.MONGODB_DB || 'devpersona';
-  async connect() { if (!process.env.MONGODB_URI) return false; this.client = new MongoClient(process.env.MONGODB_URI); await this.client.connect(); return true; }
+  async connect() { if (!process.env.MONGODB_URI) return false; this.client = new MongoClient(process.env.MONGODB_URI); await this.client.connect(); await this.db!.collection('users').createIndex({email:1},{unique:true}); return true; }
   get db() { return this.client?.db(this.dbName); }
   async listPreferences() { return this.db ? (await this.db.collection<Preference>('preferences').find().sort({updatedAt:-1}).toArray()).map(x=>({...x,id:String(x._id||x.id)})) : preferences; }
   async addPreference(p: Omit<Preference,'id'|'updatedAt'>) { const item={...p,id:new ObjectId().toString(),updatedAt:new Date().toISOString()}; if(this.db) await this.db.collection('preferences').insertOne(item); else preferences.unshift(item); return item; }

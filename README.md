@@ -11,6 +11,7 @@ An adaptive voice coding workspace that learns how a developer likes to build, t
 - Atlas Vector Search retrieval before generation
 - Local demo store and realistic seed data when credentials are absent
 - OpenAI preference extraction after each developer message
+- MongoDB-backed email/password authentication with bcrypt hashing and HTTP-only session cookies
 
 ## Run it
 
@@ -31,6 +32,7 @@ Use the database configured by `MONGODB_DB` (defaults to `devpersona`). DevPerso
 - `preferences`
 - `memories`
 - `messages`
+- `users` (unique index on `email`, created automatically)
 
 Create an Atlas Vector Search index named `devpersona_vector_index` on `memories`:
 

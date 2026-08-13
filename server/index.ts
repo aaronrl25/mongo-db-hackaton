@@ -1,9 +1,17 @@
 import 'dotenv/config';
 import express from 'express'; import cors from 'cors'; import path from 'node:path'; import { fileURLToPath } from 'node:url';
+import cookieParser from 'cookie-parser';
 import { store } from './store.ts'; import { embed, extractPreferences, resolvePreferences, respond } from './ai.ts';
-const app=express(); app.use(cors()); app.use(express.json({limit:'2mb'}));
+import { clearSession, login, publicUser, register, sessionUser, setSession } from './auth.ts';
+const app=express(); app.use(cors({origin:true,credentials:true})); app.use(express.json({limit:'2mb'})); app.use(cookieParser());
 let mongoConnected=false; store.connect().then(v=>mongoConnected=v).catch(e=>console.warn('Mongo unavailable, using demo store:',e.message));
 app.get('/api/status',(_q,r)=>r.json({mongo:mongoConnected,openai:!!process.env.OPENAI_API_KEY,elevenlabs:!!(process.env.ELEVENLABS_API_KEY&&process.env.ELEVENLABS_AGENT_ID)}));
+app.get('/api/auth/me',(q,r)=>{const user=sessionUser(q);if(!user)return r.status(401).json({error:'Not signed in'});r.json({user})});
+app.post('/api/auth/register',async(q,r)=>{try{const {email,password,name}=q.body;if(!email||!password||password.length<8)return r.status(400).json({error:'Use a valid email and a password of at least 8 characters'});const user=await register(email,password,name||'');setSession(r,user);r.status(201).json({user:publicUser(user)})}catch(e){r.status(e instanceof Error&&e.message.includes('exists')?409:503).json({error:e instanceof Error?e.message:'Registration failed'})}});
+app.post('/api/auth/login',async(q,r)=>{try{const user=await login(q.body.email||'',q.body.password||'');setSession(r,user);r.json({user:publicUser(user)})}catch(e){r.status(e instanceof Error&&e.message.includes('connected')?503:401).json({error:e instanceof Error?e.message:'Login failed'})}});
+app.post('/api/auth/logout',(_q,r)=>{clearSession(r);r.status(204).end()});
+app.post('/api/auth/dev',(_q,r)=>{if(process.env.NODE_ENV==='production'&&process.env.ALLOW_DEV_ACCESS!=='true')return r.status(403).json({error:'Dev access is disabled in production'});const user={_id:'dev-user',email:'dev@devpersona.local',name:'Dev User',passwordHash:'',createdAt:new Date().toISOString()};setSession(r,user);r.json({user:publicUser(user)})});
+app.use('/api',(q,r,next)=>{if(!sessionUser(q))return r.status(401).json({error:'Authentication required'});next()});
 app.get('/api/preferences',async(_q,r)=>r.json(await store.listPreferences()));
 app.post('/api/preferences',async(q,r)=>r.status(201).json(await store.addPreference(q.body)));
 app.delete('/api/preferences/:id',async(q,r)=>{await store.deletePreference(q.params.id);r.status(204).end()});
