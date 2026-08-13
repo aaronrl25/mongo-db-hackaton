@@ -51,10 +51,10 @@ import {
 type Page = "Overview" | "Workspace" | "Creator" | "Voice Creator" | "Personality" | "Memory" | "History" | "Privacy";
 type AgentId = "frontend" | "backend" | "data" | "animal";
 const agents = [
-  {id:"frontend" as const,name:"Frontend Artist",tag:"UI & EXPERIENCE",icon:Palette,color:"lime",description:"Crafts polished interfaces, design systems, responsive layouts, and delightful interactions.",skills:["React","TypeScript","Motion","Accessibility"]},
-  {id:"backend" as const,name:"Backend Architect",tag:"SYSTEMS & APIS",icon:Server,color:"purple",description:"Designs reliable APIs, services, authentication, databases, and production infrastructure.",skills:["Node.js","Express","MongoDB","Security"]},
-  {id:"data" as const,name:"Data Specialist",tag:"DATA & INTELLIGENCE",icon:ChartNoAxesCombined,color:"blue",description:"Builds data models, analytics, vector search, pipelines, and AI retrieval systems.",skills:["Atlas","Vector Search","Analytics","AI"]},
-  {id:"animal" as const,name:"Animal Management",tag:"CARE & OPERATIONS",icon:PawPrint,color:"orange",description:"Builds workflows for animal records, care schedules, inventory, teams, and reporting.",skills:["Care records","Scheduling","Inventory","Reports"]},
+  {id:"frontend" as const,name:"Frontend Artist",tag:"UI & EXPERIENCE",icon:Palette,color:"lime",pose:"front",badge:"RECOMMENDED",description:"Polished interfaces, design systems, responsive layouts, motion.",skills:["React","TypeScript","Motion","Accessibility"]},
+  {id:"backend" as const,name:"Backend Architect",tag:"SYSTEMS & APIS",icon:Server,color:"purple",pose:"idle",badge:"",description:"Reliable APIs, services, auth, databases, production infrastructure.",skills:["Node.js","Express","MongoDB","Security"]},
+  {id:"data" as const,name:"Data Specialist",tag:"DATA & INTELLIGENCE",icon:ChartNoAxesCombined,color:"blue",pose:"walking",badge:"",description:"Data models, analytics, vector search, pipelines, retrieval.",skills:["Atlas","Vector search","Analytics","Eval"]},
+  {id:"animal" as const,name:"Ops Builder",tag:"DOMAIN WORKFLOWS",icon:PawPrint,color:"orange",pose:"front-talk",badge:"CUSTOM",description:"Records, scheduling, inventory, teams and reporting for your vertical.",skills:["Workflows","Scheduling","Inventory","Reports"]},
 ];
 const nav = [
   ["Overview", LayoutDashboard],
@@ -142,7 +142,46 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
   );
 }
 
-function AgentSelector({select,onLogout}:{select:(id:AgentId)=>void;onLogout:()=>void}){return <div className="agent-select"><div className="agent-select-top"><PublicBrand/><button onClick={onLogout}>Sign out</button></div><div className="agent-select-copy"><span className="eyebrow">CHOOSE YOUR SPECIALIST</span><h1>Who are you building with?</h1><p>Each agent brings a different craft. Your coding personality and project memory travel with you.</p></div><div className="agent-cards">{agents.map((a,i)=><button className={'agent-card '+a.color} onClick={()=>select(a.id)} key={a.id}><div className="agent-number">0{i+1}</div><div className="agent-card-icon"><a.icon/></div><small>{a.tag}</small><h2>{a.name}</h2><p>{a.description}</p><div className="agent-skills">{a.skills.map(s=><span key={s}>{s}</span>)}</div><div className="agent-enter">Select agent <ArrowRight/></div></button>)}</div><small className="agent-select-note"><ShieldCheck/> You can switch specialists at any time without losing context.</small></div>}
+function AgentSelector({select,onLogout}:{select:(id:AgentId)=>void;onLogout:()=>void}){
+  const [picked,setPicked]=useState<AgentId>("frontend");
+  const active=agents.find(a=>a.id===picked)!;
+  return <div className="agent-pick">
+    <div className="ap-top">
+      <PublicBrand/>
+      <span className="ap-step"><i/>STEP 2 OF 3 · PICK A SPECIALIST</span>
+      <div className="ap-top-right"><span className="ap-repo">devpersona / orbit-mobile</span><button onClick={onLogout}>Sign out</button></div>
+    </div>
+    <div className="ap-main">
+      <div className="ap-head">
+        <div>
+          <span className="eyebrow">CHOOSE YOUR SPECIALIST</span>
+          <h1>Who are you building with?</h1>
+          <p>Each specialist brings a different craft. Your coding personality and project memory travel with you — switch any time without losing context.</p>
+        </div>
+        <div className="ap-callout"><img src="/sprites/talking.png" alt=""/><span>I scanned this repo — it’s mostly React and Motion. <b>Frontend Artist</b> fits.</span></div>
+      </div>
+      <div className="ap-cards">
+        {agents.map(a=><button key={a.id} className={"ap-card"+(picked===a.id?" on":"")} onClick={()=>setPicked(a.id)}>
+          <div className="ap-card-top">
+            <span className="ap-sprite"><img src={`/sprites/${a.pose}.png`} alt=""/></span>
+            {a.badge&&<span className={"ap-badge"+(a.badge==="CUSTOM"?" amber":"")}>{a.badge}</span>}
+          </div>
+          <small>{a.tag}</small>
+          <h2>{a.name}</h2>
+          <p>{a.description}</p>
+          <div className="ap-skills">{a.skills.map(s=><span key={s}>{s}</span>)}</div>
+          <div className="ap-select"><span className="ap-radio">{picked===a.id&&<Check size={12}/>}</span>{picked===a.id?"Selected":"Select agent"}</div>
+        </button>)}
+      </div>
+    </div>
+    <div className="ap-foot"><div className="ap-foot-in">
+      <img src="/sprites/walking.png" alt=""/>
+      <p>{active.name} it is — your style profile comes along.</p>
+      <button className="ap-skip" onClick={()=>select("frontend")}>Skip for now</button>
+      <button className="ap-continue" onClick={()=>select(picked)}>Continue with {active.name}</button>
+    </div></div>
+  </div>;
+}
 
 const dashboardData={
   frontend:{kicker:'DESIGN WORKBENCH',title:'Make the interface feel inevitable.',subtitle:'Shape the visual system, inspect component quality, and turn product intent into polished UI.',metrics:[['Components','48','12 need review'],['Accessibility','94%','AA target'],['Design tokens','36','Synced'],['Bundle','186 KB','−8% this week']],tasks:[['Profile settings','Responsive layout ready'],['Voice composer','Polish focus states'],['Empty states','Create illustration system']],activity:['Button variants aligned to tokens','Mobile navigation breakpoint fixed','Contrast audit completed']},
