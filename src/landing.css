@@ -25,7 +25,7 @@
 .lp-nav{display:flex;flex-direction:row;gap:30px;margin-left:8px;font-size:14.5px}
 .lp-nav a{color:#a3b5ab}
 .lp-header-actions{margin-left:auto;display:flex;align-items:center;gap:18px}
-.lp-signin{border:0;background:none;cursor:pointer;font-size:14.5px;color:#cfdcd5;padding:0}
+.lp-signin{border:0;background:none;cursor:pointer;font-size:14.5px;color:#cfdcd5;padding:0;white-space:nowrap}
 .lp-signin:hover{color:#fff}
 .lp-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:0;cursor:pointer;background:#4fc48c;color:#07120d;font-weight:600;font-size:16px;padding:15px 26px;border-radius:12px}
 .lp-btn:hover{background:#6fd6a2}
