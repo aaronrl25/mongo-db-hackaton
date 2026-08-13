@@ -11,6 +11,7 @@ An adaptive voice coding workspace that learns how a developer likes to build, t
 - Atlas Vector Search retrieval before generation
 - Local demo store and realistic seed data when credentials are absent
 - OpenAI preference extraction after each developer message
+- Claude-powered personality interview that asks adaptive questions directly in chat
 - MongoDB-backed email/password authentication with bcrypt hashing and HTTP-only session cookies
 
 ## Run it
@@ -54,6 +55,10 @@ Create an Atlas Vector Search index named `devpersona_vector_index` on `memories
 ```
 
 Embeddings use OpenAI `text-embedding-3-small`. If the index is still building or unavailable, memory retrieval safely falls back to recent project memories.
+
+## Claude personality interview
+
+Set `ANTHROPIC_API_KEY` and optionally `CLAUDE_MODEL`. In the voice workspace, choose **Build my personality**. Claude asks one focused question at a time and writes supported preferences—including confidence, scope, source, and evidence—to MongoDB. Without a Claude key, the same flow uses a deterministic local questionnaire.
 
 ## ElevenLabs
 
