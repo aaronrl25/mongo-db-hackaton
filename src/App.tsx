@@ -310,10 +310,6 @@ function Workspace({
   const { startSession, endSession } = useConversationControls();
   const { status: voiceStatus } = useConversationStatus();
   const listening = voiceStatus === "connected" || demoListening;
-  const workspacePrompts={frontend:["Design a polished responsive screen","Audit this UI for accessibility","Create a reusable component","Improve the interaction and motion"],backend:["Design a secure API endpoint","Review the service architecture","Debug this server issue","Add tests and observability"],data:["Design an Atlas vector index","Evaluate retrieval quality","Model this dataset","Build an analytics pipeline"],animal:["Create an animal care workflow","Review today's health alerts","Build a scheduling feature","Design an inventory tracker"]};
-  const suggestedQuestions = interviewing
-    ? ["Ask me about my preferred stack", "Ask about architecture and state", "Ask about testing and debugging", "Ask how I want answers formatted"]
-    : workspacePrompts[agent.id];
   useEffect(() => {
     end.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, busy]);
@@ -340,12 +336,11 @@ function Workspace({
         const r = await api.chat(prompt, `${instructions}\nActive specialist: ${agent.name}. ${agent.description}`);
         onMessage(r.message);
       }
-    } catch {
+    } catch (error) {
       onMessage({
         id: crypto.randomUUID(),
         role: "assistant",
-        content:
-          "I hit a connection problem. Your message is still here—start the API and try again.",
+        content: `I couldn't complete that request: ${error instanceof Error ? error.message : "Unknown server error"}.`,
         createdAt: new Date().toISOString(),
       });
     } finally {
@@ -399,21 +394,21 @@ function Workspace({
             </div>
           ))}
           {busy && (
-            <div className="message assistant">
-              <div className="ai-avatar">
-                <Mascot pose="front" size={22} />
+            <div className="message assistant answer-loading">
+              <div className="mascot-pose-stage">
+                <div className="loading-pose pose-idle"><Mascot pose="idle" size={48}/></div>
+                <div className="loading-pose pose-talking"><Mascot pose="talking" size={48}/></div>
+                <div className="loading-pose pose-front"><Mascot pose="front" size={40}/></div>
+                <i/><i/><i/>
               </div>
-              <div className="typing">
-                <i />
-                <i />
-                <i />
+              <div className="answer-loading-copy">
+                <small>{interviewing?'CLAUDE IS LEARNING':'DEVPERSONA IS WORKING'}</small>
+                <div className="loading-words"><span>Listening</span><span>Thinking</span><span>Building</span><span>Reviewing</span></div>
+                <div className="loading-track"><b/></div>
               </div>
             </div>
           )}
           <div ref={end} />
-        </div>
-        <div className="suggested-questions">
-          {suggestedQuestions.map(question=><button key={question} onClick={()=>setText(question)}><Sparkles size={11}/>{question}</button>)}
         </div>
         <div className="composer">
           <div className="instruction">

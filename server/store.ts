@@ -23,9 +23,26 @@ let messages: Message[] = [
 
 class Store {
   client?: MongoClient;
+  connected = false;
   dbName = process.env.MONGODB_DB || 'devpersona';
-  async connect() { if (!process.env.MONGODB_URI) return false; this.client = new MongoClient(process.env.MONGODB_URI); await this.client.connect(); await this.db!.collection('users').createIndex({email:1},{unique:true}); return true; }
-  get db() { return this.client?.db(this.dbName); }
+  async connect() {
+    if (!process.env.MONGODB_URI) return false;
+    const client = new MongoClient(process.env.MONGODB_URI, { serverSelectionTimeoutMS: 7000 });
+    try {
+      await client.connect();
+      await client.db(this.dbName).command({ ping: 1 });
+      this.client = client;
+      this.connected = true;
+      await client.db(this.dbName).collection('users').createIndex({email:1},{unique:true});
+      return true;
+    } catch (error) {
+      this.connected = false;
+      this.client = undefined;
+      await client.close().catch(() => undefined);
+      throw error;
+    }
+  }
+  get db() { return this.connected && this.client ? this.client.db(this.dbName) : undefined; }
   async listPreferences() { return this.db ? (await this.db.collection<Preference>('preferences').find().sort({updatedAt:-1}).toArray()).map(x=>({...x,id:String(x._id||x.id)})) : preferences; }
   async addPreference(p: Omit<Preference,'id'|'updatedAt'>) { const item={...p,id:new ObjectId().toString(),updatedAt:new Date().toISOString()}; if(this.db) await this.db.collection('preferences').insertOne(item); else preferences.unshift(item); return item; }
   async deletePreference(id:string) { if(this.db) await this.db.collection('preferences').deleteOne({$or:[{_id:ObjectId.isValid(id)?new ObjectId(id):undefined},{id}]}); else preferences=preferences.filter(p=>p.id!==id); }

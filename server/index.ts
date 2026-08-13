@@ -5,7 +5,7 @@ import { store } from './store.ts'; import { embed, extractPreferences, resolveP
 import { clearSession, login, publicUser, register, sessionUser, setSession } from './auth.ts';
 import { personalityInterview } from './claude.ts';
 const app=express(); app.use(cors({origin:true,credentials:true})); app.use(express.json({limit:'2mb'})); app.use(cookieParser());
-let mongoConnected=false; store.connect().then(v=>mongoConnected=v).catch(e=>console.warn('Mongo unavailable, using demo store:',e.message));
+let mongoConnected=false; store.connect().then(v=>mongoConnected=v).catch(e=>{mongoConnected=false;console.warn('Mongo unavailable, using demo store:',e.message)});
 app.get('/api/status',(_q,r)=>r.json({mongo:mongoConnected,openai:!!process.env.OPENAI_API_KEY,claude:!!process.env.ANTHROPIC_API_KEY,elevenlabs:!!(process.env.ELEVENLABS_API_KEY&&process.env.ELEVENLABS_AGENT_ID)}));
 app.get('/api/auth/me',(q,r)=>{const user=sessionUser(q);if(!user)return r.status(401).json({error:'Not signed in'});r.json({user})});
 app.post('/api/auth/register',async(q,r)=>{try{const {email,password,name}=q.body;if(!email||!password||password.length<8)return r.status(400).json({error:'Use a valid email and a password of at least 8 characters'});const user=await register(email,password,name||'');setSession(r,user);r.status(201).json({user:publicUser(user)})}catch(e){r.status(e instanceof Error&&e.message.includes('exists')?409:503).json({error:e instanceof Error?e.message:'Registration failed'})}});

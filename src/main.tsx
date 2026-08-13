@@ -6,6 +6,8 @@ import "./styles.css";
 import "./public.css";
 import "./voice.css";
 import "./responsive.css";
+import "./product-theme.css";
+import "./animations.css";
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ConversationProvider>
